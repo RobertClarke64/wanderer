@@ -1,6 +1,6 @@
 {
   "name": "wanderer",
-  "version": "0.17.0",
+  "version": "0.17.0-print-waypoints",
   "private": true,
   "scripts": {
     "dev": "vite dev",
