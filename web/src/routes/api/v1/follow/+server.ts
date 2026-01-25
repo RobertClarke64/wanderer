@@ -1,5 +1,6 @@
 import type { Actor } from '$lib/models/activitypub/actor';
 import { FollowCreateSchema } from '$lib/models/api/follow_schema';
+import { splitUsername } from '$lib/util/activitypub_util';
 import type { Follow } from '$lib/models/follow';
 import { APIError, Collection, handleError, list } from '$lib/util/api_util';
 import { json, type RequestEvent } from '@sveltejs/kit';
@@ -17,6 +18,10 @@ export async function GET(event: RequestEvent) {
 
             if (!handle || (type !== "followers" && type !== "following")) {
                 throw new APIError(400, "invalid params")
+            }
+
+            if(splitUsername(handle)[1] !== undefined && !event.locals.user) {
+                throw new APIError(401, "Unauthorized")
             }
 
             const { actor }: { actor: Actor } = await event.locals.pb.send(`/activitypub/actor?resource=acct:${handle}`, { method: "GET", fetch: event.fetch, });
