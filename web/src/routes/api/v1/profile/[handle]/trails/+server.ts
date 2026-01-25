@@ -1,5 +1,6 @@
 import type { TrailSearchResult } from '$lib/models/trail';
 import { handleError } from '$lib/util/api_util';
+import { splitUsername } from '$lib/util/activitypub_util';
 import { error, json, type RequestEvent } from '@sveltejs/kit';
 import type { SearchResponse } from 'meilisearch';
 import { ClientResponseError } from 'pocketbase';
@@ -8,6 +9,10 @@ export async function POST(event: RequestEvent) {
     const handle = event.params.handle;
     if (!handle) {
         return error(400, { message: "Bad request" })
+    }
+
+    if(splitUsername(handle)[1] !== undefined && !event.locals.user) {
+        return error(401, { message: "Unauthorized" })
     }
 
     try {

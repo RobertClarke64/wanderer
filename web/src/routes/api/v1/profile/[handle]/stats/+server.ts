@@ -1,5 +1,6 @@
 import { RecordListOptionsSchema } from '$lib/models/api/base_schema';
 import type { SummitLog } from '$lib/models/summit_log';
+import { splitUsername } from '$lib/util/activitypub_util';
 import { Collection, handleError } from '$lib/util/api_util';
 import { error, json, type RequestEvent } from '@sveltejs/kit';
 import { ClientResponseError, type ListResult } from 'pocketbase';
@@ -8,6 +9,10 @@ export async function GET(event: RequestEvent) {
     const handle = event.params.handle;
     if (!handle) {
         return error(400, { message: "Bad request" })
+    }
+
+    if(splitUsername(handle)[1] !== undefined && !event.locals.user) {
+        return error(401, { message: "Unauthorized" })
     }
 
     try {
