@@ -22,8 +22,15 @@ export function isRemoteHandle(handle: string, origin: string) {
     if (!domain) {
         return false;
     }
+    let normalizedDomain = domain;
+    try {
+        normalizedDomain = new URL(`http://${domain}`).hostname;
+    } catch {
+        normalizedDomain = domain.split(":")[0];
+    }
+    normalizedDomain = normalizedDomain.replace(/^www\./, "");
     const localHost = new URL(origin).hostname.replace(/^www\./, "");
-    return domain.toLowerCase() !== localHost.toLowerCase();
+    return normalizedDomain.toLowerCase() !== localHost.toLowerCase();
 }
 
 export function handleFromRecordWithIRI(record: any) {
